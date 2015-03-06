@@ -1,0 +1,17 @@
+import "inspectable.idl";
+import "Windows.ApplicationModel.Background.idl";
+
+namespace NMSPC
+{
+	namespace TestComponent
+	{
+		[version(1.0)]
+		[activatable(1.0)]
+		[marshaling_behavior(agile)]
+		[threading(both)]
+		runtimeclass TestBackgroundTask
+		{
+			[default] interface Windows.ApplicationModel.Background.IBackgroundTask;
+		};
+	}
+}
