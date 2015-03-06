@@ -4,9 +4,9 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Mar 06 16:46:29 2015
+/* at Fri Mar 06 17:16:22 2015
  */
-/* Compiler settings for C:\Users\vdronov\AppData\Local\Temp\TestComponent.idl-e88889f7:
+/* Compiler settings for C:\Users\vdronov\AppData\Local\Temp\TestComponent.idl-b9776283:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -51,7 +51,6 @@
 /* Forward Declarations */ 
 
 /* header files for imported files */
-#include "inspectable.h"
 #include "Windows.ApplicationModel.Background.h"
 
 #ifdef __cplusplus
