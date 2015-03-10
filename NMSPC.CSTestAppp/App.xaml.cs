@@ -6,6 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.ApplicationModel.Background;
+using NMSPC.TestComponent;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -35,7 +36,7 @@ namespace NMSPC.CSTestAppp
         {
             foreach (var pair in BackgroundTaskRegistration.AllTasks)
             {
-                pair.Value.Unregister(true);    
+                pair.Value.Unregister(true);
             }
 
             var taskBuilder = new BackgroundTaskBuilder
@@ -43,9 +44,9 @@ namespace NMSPC.CSTestAppp
                                   Name = "TestBackgroundTask",
                                   TaskEntryPoint = "NMSPC.TestComponent.TestBackgroundTask"
                               };
-            taskBuilder.SetTrigger( new SystemTrigger(SystemTriggerType.TimeZoneChange, true));
+            taskBuilder.SetTrigger(new SystemTrigger(SystemTriggerType.TimeZoneChange, true));
             taskBuilder.Register();
-            
+
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

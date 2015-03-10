@@ -14,18 +14,18 @@ ULONG m_objectsCount = 0;
 
 //Класс реализации фоновой задачи. 
 //Реализует единственный "интерфейс" IBackgroundTask
-class TestBackgroundTaskImpl sealed : public IBackgroundTask
+class ABI::NMSPC::TestComponent::TestBackgroundTask sealed : public IBackgroundTask
 {
 	//Переменная для подсчёта ссылок на текущий объект
 	ULONG m_count;
 public:
-	TestBackgroundTaskImpl() throw()
+	TestBackgroundTask() throw()
 		: m_count(1)
 	{
 		//Увеличиваем общее количество экземпляров объектов библиотеки
 		InterlockedIncrement(&m_objectsCount);
 	}
-	~TestBackgroundTaskImpl() throw()
+	~TestBackgroundTask() throw()
 	{
 		//Уменьшаем общее количество экземпляров объектов библиотеки
 		InterlockedDecrement(&m_objectsCount);
@@ -114,10 +114,10 @@ public:
 	}
 
 	//Реализация IBackgroundTask метода запуска фоновой задачи
-	STDMETHODIMP Run(IBackgroundTaskInstance*) throw() override final
+	STDMETHODIMP Run(IBackgroundTaskInstance* task_instance) throw() override final
 	{
 		//Просто пишем строку в отладочное окно
-		OutputDebugStringW(L"Hello from background task\r\n");
+		OutputDebugStringW(L"Hello from background task.\r\n");
 		return S_OK;
 	}
 };
@@ -160,6 +160,7 @@ public:
 		//Возвращаем количество ссылок
 		return count;
 	}
+	//Реализация COM метода опроса на имплементацию заданного интерфейса
 	STDMETHODIMP QueryInterface(const IID& riid, void** ppvObject) throw() override final
 	{
 		if (__uuidof(IUnknown) == riid || __uuidof(IInspectable) == riid || __uuidof(IActivationFactory) == riid)
@@ -174,7 +175,7 @@ public:
 		static_cast<IInspectable*>(*ppvObject)->AddRef();
 		return S_OK;
 	}
-	
+
 	//Реализация WINRT метода получения массива идентификаторов реализуемых интерфейсов
 	STDMETHODIMP GetIids(ULONG* iidCount, IID** iids) throw() override final
 	{
@@ -205,30 +206,47 @@ public:
 		*trustLevel = BaseTrust;
 		return S_OK;
 	}
-	
+
 	//Реализация IActivationFactory метода инстанциирования экземпляра
 	STDMETHODIMP ActivateInstance(IInspectable** instance) throw() override final
 	{
+		//Если указатель равено null
+		if (nullptr == instance)
+		{
+			//Возвращаем ошибку
+			return E_INVALIDARG;
+		}
 		//Создаём объект 
 		//При этом указываем признак того, что не надо генерировать исключение
-		*instance = new (std::nothrow) TestBackgroundTaskImpl();
+		*instance = new (std::nothrow) TestBackgroundTask();
 		//Возвращаем результат в зависимости от успешности создания объекта
 		return *instance ? S_OK : E_OUTOFMEMORY;
 	}
 };
 
-STDAPI DllGetActivationFactory(HSTRING activatableClassId, IActivationFactory **factory) throw()
+//Реализация экспортируемой функции получения фабрики объектов класса, имеющего идентификатор activatableClassId
+HRESULT WINAPI DllGetActivationFactory(HSTRING activatableClassId, IActivationFactory **factory) throw()
 {
+	//Проверяем идентфикатор класса и указатель на фабрику
+	if (WindowsIsStringEmpty(activatableClassId) || nullptr == factory)
+	{
+		//Если идентификатор не задан или указатель нулевой
+		return E_INVALIDARG;
+	}
+	//Проверяем на равенство строки идентификатора класса и определенного нами класса
 	if (0 == wcscmp(RuntimeClass_NMSPC_TestComponent_TestBackgroundTask, WindowsGetStringRawBuffer(activatableClassId, nullptr)))
 	{
+		//Инициализируем указатель
 		*factory = new (std::nothrow) TestBackgroundTaskFactory();
 		return *factory ? S_OK : E_OUTOFMEMORY;
 	}
 	*factory = nullptr;
-	return CLASS_E_CLASSNOTAVAILABLE;
+	return E_NOINTERFACE;
 }
 
-STDAPI DllCanUnloadNow() throw()
+//Реализация экспортируемой функции опроса возможности выгрузки библиотеки
+HRESULT WINAPI DllCanUnloadNow() throw()
 {
+	//Возвращаем признак в зависимости от количества текущий экземпляров
 	return m_objectsCount ? S_FALSE : S_OK;
 }
