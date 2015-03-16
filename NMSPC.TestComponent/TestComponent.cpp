@@ -31,6 +31,7 @@ public:
 		InterlockedDecrement(&m_objectsCount);
 	}
 
+#pragma region IUnknown 
 	//Реализация COM метода увеличения счетчика ссылок на объект
 	STDMETHODIMP_(ULONG) AddRef() throw() override final
 	{
@@ -72,7 +73,10 @@ public:
 		static_cast<IInspectable*>(*ppvObject)->AddRef();
 		return S_OK;
 	}
+#pragma endregion
 
+
+#pragma region IInspectable
 	//Реализация WINRT метода получения массива идентификаторов реализуемых интерфейсов
 	STDMETHODIMP GetIids(ULONG* iidCount, IID** iids) throw() override
 	{
@@ -112,7 +116,9 @@ public:
 		*trustLevel = BaseTrust;
 		return S_OK;
 	}
+#pragma endregion
 
+#pragma region IBackgroundTask
 	//Реализация IBackgroundTask метода запуска фоновой задачи
 	STDMETHODIMP Run(IBackgroundTaskInstance* task_instance) throw() override final
 	{
@@ -120,6 +126,8 @@ public:
 		OutputDebugStringW(L"Hello from background task.\r\n");
 		return S_OK;
 	}
+#pragma endregion
+
 };
 
 //Класс реализации фабрики фоновых задач.

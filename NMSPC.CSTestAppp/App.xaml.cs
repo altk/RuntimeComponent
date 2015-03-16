@@ -34,18 +34,18 @@ namespace NMSPC.CSTestAppp
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            foreach (var pair in BackgroundTaskRegistration.AllTasks)
-            {
-                pair.Value.Unregister(true);
-            }
+foreach (var pair in BackgroundTaskRegistration.AllTasks)
+{
+    pair.Value.Unregister(true);
+}
 
-            var taskBuilder = new BackgroundTaskBuilder
-                              {
-                                  Name = "TestBackgroundTask",
-                                  TaskEntryPoint = "NMSPC.TestComponent.TestBackgroundTask"
-                              };
-            taskBuilder.SetTrigger(new SystemTrigger(SystemTriggerType.TimeZoneChange, true));
-            taskBuilder.Register();
+var taskBuilder = new BackgroundTaskBuilder
+                    {
+                        Name = "TestBackgroundTask",
+                        TaskEntryPoint = "NMSPC.TestComponent.TestBackgroundTask"
+                    };
+taskBuilder.SetTrigger(new SystemTrigger(SystemTriggerType.TimeZoneChange, true));
+taskBuilder.Register();
 
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
